@@ -1,5 +1,12 @@
 #!/usr/bin/python3
 
+"""
+Name: cuddlyclara
+Website: cuddlyclara.de
+Source: https://github.com/cuddlyclara/SSHKeyFetch
+Description: This program uses SSH keys stored in GitHub for secure client authentication with OpenSSH servers via the "AuthorizedKeysCommand" option.
+"""
+
 import requests
 import sys
 import os
