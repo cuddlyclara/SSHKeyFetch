@@ -99,7 +99,7 @@ def main(username):
         # If cachefile is not readable, print the error message and use an empty key list
         print(e, file=sys.stderr)
         keys = []
-    
+
     write_console(keys)
 
 if __name__ == '__main__':
