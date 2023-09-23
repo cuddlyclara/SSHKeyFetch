@@ -45,15 +45,14 @@ def write_console(keys):
 def get_configuration(username):
     # Get the path to the user's configuration file
     config_file_path = os.path.expanduser(f'~{username}/.ssh/github.yaml')
-    
+
     # Read the configuration from YAML file
     with open(config_file_path, 'r') as configuration_file:
         config = yaml.safe_load(configuration_file)
-    
+
     # Check if both 'username' and 'token' are present in the configuration
     if not all(key in config for key in ('username', 'token')):
         raise ValueError('Username or token not set in config file')
-    
     return config
 
 def main(username):
