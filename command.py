@@ -11,6 +11,7 @@ import requests
 import sys
 import os
 import yaml
+import time
 
 def get_github_keys(username, token):
     # Build the GitHub API URL for fetching user keys
@@ -44,6 +45,13 @@ def read_cachefile(path):
         keys = [key.strip() for key in cachefile.readlines()]
     return keys
 
+def check_cachefile_changed_recently(path, threshold_seconds=10):
+    if os.path.exists(path):
+        file_modified_time = os.path.getmtime(path)
+        current_time = time.time()
+        return current_time - file_modified_time <= threshold_seconds
+    return False
+
 def write_console(keys):
     # Print the keys to the console via stdout
     for key in keys:
@@ -66,20 +74,31 @@ def main(username):
     # Path for the cache file
     cachefilepath = os.path.expanduser(f'~{username}/.ssh/authorized_keys_github')
 
+    # Try to load the configuration file
     try:
-        # Get the configuration, obtain user keys, and store them in the cache.
         config = get_configuration(username)
-        keys = get_github_keys(config['username'], config['token'])
-        write_cachefile(keys, cachefilepath)
     except Exception as e:
-        # If there's an exception, print the error message and try to read keys from the cache file
+        # If configuration is not readable, print the error message to stderr and exit with code 1
         print(e, file=sys.stderr)
-        try:
+        exit(1)
+
+    try:
+        if check_cachefile_changed_recently(cachefilepath):
+            # If the cache file has been recently updated, retrieve keys from it to reduce the number of requests to GitHub
             keys = read_cachefile(cachefilepath)
-        except Exception:
-            # If cachefile is not readable, use an empty key list
-            print(e, file=sys.stderr)
-            keys = []
+        else:
+            try:
+                # Otherwise, obtain keys from GitHub and store them in the cache
+                keys = get_github_keys(config['username'], config['token'])
+                write_cachefile(keys, cachefilepath)
+            except Exception as e:
+                # If there's an exception while accessing GitHub, print the error message and try to read keys from the cache file
+                print(e, file=sys.stderr)
+                keys = read_cachefile(cachefilepath)
+    except Exception as e:
+        # If cachefile is not readable, print the error message and use an empty key list
+        print(e, file=sys.stderr)
+        keys = []
     
     write_console(keys)
 
