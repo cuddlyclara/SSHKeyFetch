@@ -70,13 +70,13 @@ def main(username):
         try:
             keys = read_cachefile(cachefilepath)
         except Exception:
-            # If cachefile is not readable, use an empty list
+            # If cachefile is not readable, use an empty key list
             print(e, file=sys.stderr)
             keys = []
     
     write_console(keys)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Verify if the username has been specified as a command-line argument
     if len(sys.argv) != 2:
         sys.exit(1)
