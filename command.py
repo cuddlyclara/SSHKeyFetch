@@ -7,7 +7,7 @@ import yaml
 
 def get_github_keys(username, token):
     # Build the GitHub API URL for fetching user keys
-    url = f'https://0.0.0.0/users/{username}/keys'
+    url = f'https://api.github.com/users/{username}/keys'
 
     # Set the necessary headers with the GitHub token
     headers = {
