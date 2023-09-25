@@ -14,6 +14,8 @@ import yaml
 import time
 from timeout_decorator import timeout
 
+# Set Timeout
+@timeout(10)
 def get_github_keys(username, token):
     # Build the GitHub API URL for fetching user keys
     url = f'https://api.github.com/users/{username}/keys'
@@ -71,8 +73,6 @@ def get_configuration(username):
         raise ValueError('Username or token not set in config file')
     return config
 
-# Set Timeout
-@timeout(10)
 def main(username):
     # Path for the cache file
     cachefilepath = os.path.expanduser(f'~{username}/.ssh/authorized_keys_github')
