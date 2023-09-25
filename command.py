@@ -16,15 +16,18 @@ from timeout_decorator import timeout
 
 # Set Timeout
 @timeout(10)
-def get_github_keys(username, token):
+def get_github_keys(username, token=None):
     # Build the GitHub API URL for fetching user keys
     url = f'https://api.github.com/users/{username}/keys'
 
-    # Set the necessary headers with the GitHub token
+    # Define the base headers
     headers = {
-        'Authorization': f'token {token}',
         'Accept': 'application/vnd.github.v3+json'
     }
+
+    # Add an optional token to the headers if provided
+    if token is not None:
+        headers['Authorization'] = f'token {token}'
 
     # Send a GET request to fetch user keys
     response = requests.get(url, headers=headers, timeout=5)
@@ -68,9 +71,9 @@ def get_configuration(username):
     with open(config_file_path, 'r') as configuration_file:
         config = yaml.safe_load(configuration_file)
 
-    # Check if both 'username' and 'token' are present in the configuration
-    if not all(key in config for key in ('username', 'token')):
-        raise ValueError('Username or token not set in config file')
+    # Check if 'username' is present in the configuration file
+    if 'username' not in config:
+        raise ValueError('Username not set in config file')
     return config
 
 def main(username):
@@ -92,7 +95,7 @@ def main(username):
         else:
             try:
                 # Otherwise, obtain keys from GitHub and store them in the cache
-                keys = get_github_keys(config['username'], config['token'])
+                keys = get_github_keys(config.get('username'), config.get('token'))
                 write_cachefile(keys, cachefilepath)
             except Exception as e:
                 # If there's an exception while accessing GitHub, print the error message and try to read keys from the cache file
